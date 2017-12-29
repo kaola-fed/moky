@@ -1,4 +1,5 @@
 const path = require('path')
+const Moky = require('./moky')
 const app = require('./app')
 const { init, parseConfig } = require('./lib/utils')
 
@@ -44,4 +45,16 @@ const handler = async (argv) => {
   app(options)
 }
 
-module.exports = { builder, handler }
+/*
+ * options
+ * {
+ * ** frame: 'koa'|'express'
+ * ** moky: 'async'|'render'|'proxy'
+ * }
+ */
+const middleware = (options) => {
+  const moky = new Moky(options);
+  return moky.middleware();
+}
+
+module.exports = { builder, handler, middleware }
