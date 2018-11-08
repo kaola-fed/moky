@@ -16,7 +16,7 @@ module.exports = {
   // Default async mock data, OPTIONAL
   // If mock file is missing or empty, then return this
   defaultMock: {},
-
+  neiKey: '123',
   // Root directory for template rendering, REQUIRED
   viewsPath: path.join(__dirname, 'views'),
 
