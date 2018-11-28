@@ -5,7 +5,7 @@ const path = require('path')
 const chalk = require('chalk')
 const url = require('url')
 const got = require('got')
-const { copy, writeJSONSync, removeSync, existsSync, writeJson } = require('fs-extra')
+const { copy, writeJSONSync, removeSync, existsSync, writeJson, ensureFileSync } = require('fs-extra')
 
 exports.log = new Logger('moky');
 
