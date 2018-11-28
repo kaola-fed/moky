@@ -4,36 +4,27 @@ const Logger = require('chalklog')
 const path = require('path')
 const chalk = require('chalk')
 const url = require('url')
-const https = require('https')
+const got = require('got')
 const { copy, writeJSONSync, removeSync, existsSync, writeJson } = require('fs-extra')
 
 exports.log = new Logger('moky');
 
-const getNeiData = async (ctx, neiKey='') => new Promise((resolve, reject) => {
+const getNeiData = async (ctx, neiKey='') => {
   if(!neiKey){
-    resolve(false);
+    return false
   }
   const nei = 'https://nei.netease.com/api/apimock/';
   const url = `${nei}${neiKey}${ctx.path}`;
-  https.get(url, (res) => {
-      res.on('data', (data) => {
-          try{
-            json = JSON.parse(data);
-            if (!json.code || json.code === 403) {
-              this.log.red(`${ctx.path} in NEI doesn't exists`);
-              resolve(false);
-            }
-            resolve(json);
-          }
-          catch(err){
-            resolve(false);
-          }
-      });
-  }).on('error', (e) => {
-      this.log.red(`read NEI error`);
-      resolve(false);
-  });
-});
+ 
+  try {
+    const res = await got.post(url);
+    return JSON.parse(res.body);
+  }catch(e) {
+    this.log.red(e)
+    return false;
+  }
+};
+
 
 const readObj = async (file, ctx, defaultMock = {}, neiKey='') => {
   const jsonName = file + '.json'
@@ -41,9 +32,11 @@ const readObj = async (file, ctx, defaultMock = {}, neiKey='') => {
   if (!existsSync(jsonName) && !existsSync(jsName)) {
     this.log.red(`${file}.js{on} doesn't exists`);
     const mockData = await getNeiData(ctx, neiKey) || defaultMock;
-    writeJson(file + '.json', mockData, err => {
+    ensureFileSync(jsonName)
+    writeJSONSync(jsonName, mockData, err => {
       if (err){
         this.log.red(err);
+        return false;
       }
       this.log.yellow(`set mock data to ${ctx.path}.json`);
     });
