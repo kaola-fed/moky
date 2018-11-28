@@ -33,12 +33,8 @@ const readObj = async (file, ctx, defaultMock = {}, neiKey='') => {
     this.log.red(`${file}.js{on} doesn't exists`);
     const mockData = await getNeiData(ctx, neiKey) || defaultMock;
     ensureFileSync(jsonName)
-    writeJSONSync(jsonName, mockData, err => {
-      if (err){
-        this.log.red(err);
-        return false;
-      }
-      this.log.yellow(`set mock data to ${ctx.path}.json`);
+    writeJSONSync(jsonName, mockData, {
+      spaces: 4
     });
     return mockData;
   }
