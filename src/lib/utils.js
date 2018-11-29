@@ -13,12 +13,12 @@ const getNeiData = async (ctx, neiKey='') => {
   if(!neiKey){
     return false
   }
-  const path = ctx.path.substr(0, ctx.path.indexOf('?'));
   const nei = 'https://nei.netease.com/api/apimock/';
-  const url = `${nei}${neiKey}${path}`;
+  const url = `${nei}${neiKey}${ctx.path}`;
  
   try {
-    const res = await got.post(url);
+    const request = ctx.method.toLowerCase() === 'get' ? got.get : got.post;
+    const res = await request(url);
     if(res.code === 403) {
       this.log.red('nei error:', res.msg);
       return false;
@@ -37,6 +37,7 @@ const readObj = async (file, ctx, defaultMock = {}, neiKey='') => {
   if (!existsSync(jsonName) && !existsSync(jsName)) {
     this.log.red(`${file}.js{on} doesn't exists`);
     const mockData = await getNeiData(ctx, neiKey) || defaultMock;
+    mockData.code = 200;
     ensureFileSync(jsonName)
     writeJSONSync(jsonName, mockData, {
       spaces: 4
