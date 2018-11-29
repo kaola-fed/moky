@@ -13,11 +13,16 @@ const getNeiData = async (ctx, neiKey='') => {
   if(!neiKey){
     return false
   }
+  const path = ctx.path.substr(0, ctx.path.indexOf('?'));
   const nei = 'https://nei.netease.com/api/apimock/';
-  const url = `${nei}${neiKey}${ctx.path}`;
+  const url = `${nei}${neiKey}${path}`;
  
   try {
     const res = await got.post(url);
+    if(res.code === 403) {
+      this.log.red('nei error:', res.msg);
+      return false;
+    }
     return JSON.parse(res.body);
   }catch(e) {
     this.log.red(e)
