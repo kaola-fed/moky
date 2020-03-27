@@ -15,7 +15,7 @@ const getNeiData = async (ctx, neiKey='') => {
   }
   const nei = 'https://nei.netease.com/api/apimock/';
   const url = `${nei}${neiKey}${ctx.path}`;
- 
+
   try {
     const request = ctx.method.toLowerCase() === 'get' ? got.get : got.post;
     const res = await request(url);
@@ -47,6 +47,9 @@ const readObj = async (file, ctx, defaultMock = {}, neiKey='') => {
   try {
     decache(file)
     const obj = require(file)
+    if (typeof obj === 'function') {
+      return obj(ctx)
+    }
     return obj
   } catch (err) {
     this.log.red(err)
